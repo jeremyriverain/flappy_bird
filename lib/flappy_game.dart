@@ -1,14 +1,9 @@
-import 'dart:ui';
 import 'package:flame/game.dart';
+import 'package:flappy_bird/background.dart';
 
-class FlappyGame extends Game {
+class FlappyGame extends FlameGame {
   @override
-  void render(Canvas canvas) {
-    // TODO: implement render
-  }
-
-  @override
-  void update(double dt) {
-    // TODO: implement update
+  Future<void> onLoad() async {
+    add(Background());
   }
 }
