@@ -10,21 +10,16 @@ class FlappyGame extends FlameGame {
   Future<void> onLoad() async {
     add(Background());
 
-    _initFloorComponents();
+    _loadFloorComponents();
   }
 
   @override
   void update(double dt) {
-    final hiddenFloorComponents =
-        floorComponents.where((element) => element.hasDisappeared == true);
-    if (hiddenFloorComponents.length == 2) {
-      _initFloorComponents();
-    }
+    _updateFloorComponents();
     super.update(dt);
   }
 
-  _initFloorComponents() {
-    removeAll(floorComponents);
+  void _loadFloorComponents() {
     floorComponents = [
       Floor(initialLeftPosition: 0),
       Floor(initialLeftPosition: size[0]),
@@ -32,5 +27,16 @@ class FlappyGame extends FlameGame {
     for (var floorComponent in floorComponents) {
       add(floorComponent);
     }
+  }
+
+  void _updateFloorComponents() {
+    floorComponents
+        .where((element) => element.hasDisappeared == true)
+        .forEach((element) {
+      remove(element);
+      floorComponents.removeAt(0);
+      floorComponents.add(Floor(initialLeftPosition: size[0] - 5));
+      add(floorComponents.last);
+    });
   }
 }

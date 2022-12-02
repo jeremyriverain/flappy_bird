@@ -19,7 +19,7 @@ class Floor extends SpriteComponent with HasGameRef<FlappyGame> {
   @override
   void update(double dt) {
     position = Vector2(position.x - 130 * dt, gameRef.size[1] * 7 / 8);
-    if (position.x <= 0) {
+    if (position.x <= -gameRef.size[0]) {
       hasDisappeared = true;
     }
     super.update(dt);
