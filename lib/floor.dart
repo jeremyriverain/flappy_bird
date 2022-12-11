@@ -1,5 +1,6 @@
 import 'package:flame/components.dart';
 import 'package:flappy_bird/flappy_game.dart';
+import 'constants.dart' as constants;
 
 class Floor extends SpriteComponent with HasGameRef<FlappyGame> {
   final double initialLeftPosition;
@@ -18,7 +19,8 @@ class Floor extends SpriteComponent with HasGameRef<FlappyGame> {
 
   @override
   void update(double dt) {
-    position = Vector2(position.x - 130 * dt, gameRef.size[1] * 7 / 8);
+    position =
+        Vector2(position.x - constants.speed * dt, gameRef.size[1] * 7 / 8);
     if (position.x <= -gameRef.size[0]) {
       hasDisappeared = true;
     }

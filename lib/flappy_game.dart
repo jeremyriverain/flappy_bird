@@ -2,6 +2,7 @@ import 'package:flame/game.dart';
 
 import 'package:flappy_bird/background.dart';
 import 'package:flappy_bird/floor.dart';
+import 'package:flappy_bird/pipes.dart';
 
 class FlappyGame extends FlameGame {
   List<Floor> floorComponents = [];
@@ -9,6 +10,7 @@ class FlappyGame extends FlameGame {
   @override
   Future<void> onLoad() async {
     add(Background());
+    add(Pipes());
 
     _loadFloorComponents();
   }
