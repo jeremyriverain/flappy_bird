@@ -14,6 +14,7 @@ class Floor extends SpriteComponent with HasGameRef<FlappyGame> {
     x = initialLeftPosition;
     y = gameRef.size[1] * 7 / 8;
     size = Vector2(gameRef.size[0], gameRef.size[1] / 8);
+    priority = 1;
     return super.onLoad();
   }
 

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flame/game.dart';
 
 import 'package:flappy_bird/background.dart';
@@ -7,10 +9,17 @@ import 'package:flappy_bird/pipes.dart';
 class FlappyGame extends FlameGame {
   List<Floor> floorComponents = [];
 
+  final List<Pipes> pipes = [];
+
   @override
   Future<void> onLoad() async {
     add(Background());
-    add(Pipes());
+
+    Timer.periodic(const Duration(seconds: 2), (Timer time) {
+      final p = Pipes();
+      pipes.add(p);
+      add(p);
+    });
 
     _loadFloorComponents();
   }
@@ -18,6 +27,9 @@ class FlappyGame extends FlameGame {
   @override
   void update(double dt) {
     _updateFloorComponents();
+    removeAll(pipes.where((element) => element.hasDisappeared == true));
+    pipes.removeWhere((element) => element.hasDisappeared == true);
+
     super.update(dt);
   }
 

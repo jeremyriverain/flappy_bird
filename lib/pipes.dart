@@ -1,9 +1,13 @@
+import 'dart:math';
+
 import 'package:flame/components.dart';
 import 'package:flappy_bird/flappy_game.dart';
 import 'constants.dart' as constants;
 
 class Pipes extends Component with HasGameRef<FlappyGame> {
-  final double topPipeHeight = 300;
+  bool hasDisappeared = false;
+  late final double topPipeHeight;
+  late final List<double> topPipeHeights;
   final double pipeWidth = 70;
   late final double initialPipeX;
 
@@ -17,6 +21,13 @@ class Pipes extends Component with HasGameRef<FlappyGame> {
 
   @override
   Future<void>? onLoad() async {
+    topPipeHeights = [
+      gameRef.size[1] / 6,
+      gameRef.size[1] / 4,
+      gameRef.size[1] / 3,
+      gameRef.size[1] / 2,
+    ];
+    topPipeHeight = topPipeHeights[Random().nextInt(4)];
     initialPipeX = gameRef.size[0] + 50;
     topPipeBody = await _getPipeBody()
       ..position = Vector2(initialPipeX, 0);
@@ -28,7 +39,8 @@ class Pipes extends Component with HasGameRef<FlappyGame> {
     bottomPipeHead = await _getPipeHead()
       ..position = Vector2(initialPipeX - 3, bottomPipeHeadY);
     bottomPipeBody = await _getPipeBody()
-      ..position = Vector2(initialPipeX, bottomPipeHeadY + pipeHeadHeight);
+      ..position = Vector2(initialPipeX, bottomPipeHeadY + pipeHeadHeight)
+      ..height = gameRef.size[1] / 2;
 
     add(topPipeBody);
     add(topPipeHead);
@@ -55,6 +67,10 @@ class Pipes extends Component with HasGameRef<FlappyGame> {
     topPipeHead.x -= delta;
     bottomPipeBody.x -= delta;
     bottomPipeHead.x -= delta;
+
+    if (topPipeBody.x <= -100) {
+      hasDisappeared = true;
+    }
     super.update(dt);
   }
 }
