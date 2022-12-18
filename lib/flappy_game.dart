@@ -1,15 +1,19 @@
 import 'dart:async';
 
 import 'package:flame/game.dart';
+import 'package:flame/input.dart';
 
 import 'package:flappy_bird/background.dart';
+import 'package:flappy_bird/bird.dart';
 import 'package:flappy_bird/floor.dart';
 import 'package:flappy_bird/pipes.dart';
 
-class FlappyGame extends FlameGame {
+class FlappyGame extends FlameGame with TapDetector {
   List<Floor> floorComponents = [];
 
   final List<Pipes> pipes = [];
+
+  final Bird bird = Bird();
 
   @override
   Future<void> onLoad() async {
@@ -22,6 +26,8 @@ class FlappyGame extends FlameGame {
     });
 
     _loadFloorComponents();
+
+    add(bird);
   }
 
   @override
@@ -52,5 +58,11 @@ class FlappyGame extends FlameGame {
       floorComponents.add(Floor(initialLeftPosition: size[0] - 5));
       add(floorComponents.last);
     });
+  }
+
+  @override
+  void onTap() {
+    bird.onTap();
+    super.onTap();
   }
 }
