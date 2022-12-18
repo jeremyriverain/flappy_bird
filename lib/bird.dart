@@ -1,10 +1,11 @@
+import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:flame/game.dart';
 import 'package:flappy_bird/flappy_game.dart';
 
 const double gravityBird = 0.25;
 
-class Bird extends SpriteAnimationComponent with HasGameRef<FlappyGame> {
+class Bird extends SpriteAnimationComponent
+    with HasGameRef<FlappyGame>, CollisionCallbacks {
   double fallingMovement = 0;
   bool isJumping = false;
 
@@ -23,6 +24,8 @@ class Bird extends SpriteAnimationComponent with HasGameRef<FlappyGame> {
     y = gameRef.size[1] / 2;
 
     priority = 1;
+
+    add(RectangleHitbox());
 
     return super.onLoad();
   }
@@ -43,5 +46,10 @@ class Bird extends SpriteAnimationComponent with HasGameRef<FlappyGame> {
 
   void onTap() {
     isJumping = true;
+  }
+
+  @override
+  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+    print(other);
   }
 }

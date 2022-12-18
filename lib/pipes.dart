@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flappy_bird/flappy_game.dart';
 import 'constants.dart' as constants;
@@ -52,12 +53,18 @@ class Pipes extends Component with HasGameRef<FlappyGame> {
 
   Future<SpriteComponent> _getPipeBody() async {
     return SpriteComponent(sprite: await Sprite.load('pipe_body.png'))
-      ..size = Vector2(pipeWidth, topPipeHeight);
+      ..size = Vector2(pipeWidth, topPipeHeight)
+      ..add(
+        RectangleHitbox()..collisionType = CollisionType.passive,
+      );
   }
 
   Future<SpriteComponent> _getPipeHead() async {
     return SpriteComponent(sprite: await Sprite.load('pipe_head.png'))
-      ..size = Vector2(pipeWidth + 6, pipeHeadHeight);
+      ..size = Vector2(pipeWidth + 6, pipeHeadHeight)
+      ..add(
+        RectangleHitbox()..collisionType = CollisionType.passive,
+      );
   }
 
   @override

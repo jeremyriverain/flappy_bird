@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flame/collisions.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
 
@@ -8,7 +9,7 @@ import 'package:flappy_bird/bird.dart';
 import 'package:flappy_bird/floor.dart';
 import 'package:flappy_bird/pipes.dart';
 
-class FlappyGame extends FlameGame with TapDetector {
+class FlappyGame extends FlameGame with TapDetector, HasCollisionDetection {
   List<Floor> floorComponents = [];
 
   final List<Pipes> pipes = [];
@@ -17,6 +18,7 @@ class FlappyGame extends FlameGame with TapDetector {
 
   @override
   Future<void> onLoad() async {
+    add(ScreenHitbox());
     add(Background());
 
     Timer.periodic(const Duration(seconds: 2), (Timer time) {
