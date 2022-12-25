@@ -1,5 +1,6 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flappy_bird/flappy_game.dart';
 
 const double gravityBird = 0.25;
@@ -33,6 +34,7 @@ class Bird extends SpriteAnimationComponent
   @override
   void update(double dt) {
     if (isJumping == true) {
+      FlameAudio.play('wing.wav');
       fallingMovement = -6;
       isJumping = false;
     } else {

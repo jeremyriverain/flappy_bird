@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
+import 'package:flame_audio/flame_audio.dart';
 
 import 'package:flappy_bird/background.dart';
 import 'package:flappy_bird/bird.dart';
@@ -25,6 +26,8 @@ class FlappyGame extends FlameGame with TapDetector, HasCollisionDetection {
 
   @override
   Future<void> onLoad() async {
+    await FlameAudio.audioCache.loadAll(['hit.wav', 'point.wav', 'wing.wav']);
+
     add(ScreenHitbox());
     add(Background());
 
@@ -35,6 +38,7 @@ class FlappyGame extends FlameGame with TapDetector, HasCollisionDetection {
 
   onGameOver() {
     isPlaying = false;
+    FlameAudio.play('hit.wav');
     timer?.cancel();
     remove(bird);
     removeAll(pipes);
