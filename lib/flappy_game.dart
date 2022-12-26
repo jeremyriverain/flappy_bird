@@ -8,6 +8,7 @@ import 'package:flame/components.dart' show Anchor;
 
 import 'package:flappy_bird/background.dart';
 import 'package:flappy_bird/bird.dart';
+import 'package:flappy_bird/constants.dart';
 import 'package:flappy_bird/floor.dart';
 import 'package:flappy_bird/init_screen.dart';
 import 'package:flappy_bird/pipes.dart';
@@ -62,6 +63,7 @@ class FlappyGame extends FlameGame with TapDetector, HasCollisionDetection {
     });
     bird = Bird();
     add(bird);
+    score = 0;
     isPlaying = true;
   }
 
@@ -91,6 +93,15 @@ class FlappyGame extends FlameGame with TapDetector, HasCollisionDetection {
     _updateFloorComponents();
     removeAll(pipes.where((element) => element.hasDisappeared == true));
     pipes.removeWhere((element) => element.hasDisappeared == true);
+
+    pipes.where((element) => element.canUpdateScore).forEach((element) {
+      if ((element.topPipeBody.x + element.topPipeBody.width / 2) <=
+          (widthBird + distanceFromLeftBird)) {
+        FlameAudio.play('point.wav');
+        score++;
+        element.canUpdateScore = false;
+      }
+    });
 
     super.update(dt);
   }

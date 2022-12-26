@@ -1,6 +1,7 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame_audio/flame_audio.dart';
+import 'package:flappy_bird/constants.dart';
 import 'package:flappy_bird/flappy_game.dart';
 
 const double gravityBird = 0.25;
@@ -19,9 +20,9 @@ class Bird extends SpriteAnimationComponent
       await Future.wait(sprites),
       stepTime: 0.08,
     );
-    size = Vector2(50, 35);
+    size = Vector2(widthBird, 35);
 
-    x = 50;
+    x = distanceFromLeftBird;
     y = gameRef.size[1] / 2;
 
     priority = 1;
