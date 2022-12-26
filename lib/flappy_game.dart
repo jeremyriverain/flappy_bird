@@ -4,12 +4,14 @@ import 'package:flame/collisions.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
 import 'package:flame_audio/flame_audio.dart';
+import 'package:flame/components.dart' show Anchor;
 
 import 'package:flappy_bird/background.dart';
 import 'package:flappy_bird/bird.dart';
 import 'package:flappy_bird/floor.dart';
 import 'package:flappy_bird/init_screen.dart';
 import 'package:flappy_bird/pipes.dart';
+import 'package:flutter/material.dart';
 
 class FlappyGame extends FlameGame with TapDetector, HasCollisionDetection {
   List<Floor> floorComponents = [];
@@ -23,6 +25,11 @@ class FlappyGame extends FlameGame with TapDetector, HasCollisionDetection {
   InitScreen initScreen = InitScreen();
 
   bool isPlaying = false;
+
+  int score = 0;
+  TextPaint textPaint = TextPaint(
+    style: const TextStyle(fontFamily: 'flappy_bird', fontSize: 45),
+  );
 
   @override
   Future<void> onLoad() async {
@@ -58,15 +65,6 @@ class FlappyGame extends FlameGame with TapDetector, HasCollisionDetection {
     isPlaying = true;
   }
 
-  @override
-  void update(double dt) {
-    _updateFloorComponents();
-    removeAll(pipes.where((element) => element.hasDisappeared == true));
-    pipes.removeWhere((element) => element.hasDisappeared == true);
-
-    super.update(dt);
-  }
-
   void _loadFloorComponents() {
     floorComponents = [
       Floor(initialLeftPosition: 0),
@@ -86,6 +84,29 @@ class FlappyGame extends FlameGame with TapDetector, HasCollisionDetection {
       floorComponents.add(Floor(initialLeftPosition: size[0] - 5));
       add(floorComponents.last);
     });
+  }
+
+  @override
+  void update(double dt) {
+    _updateFloorComponents();
+    removeAll(pipes.where((element) => element.hasDisappeared == true));
+    pipes.removeWhere((element) => element.hasDisappeared == true);
+
+    super.update(dt);
+  }
+
+  @override
+  void render(Canvas canvas) {
+    super.render(canvas);
+
+    if (isPlaying) {
+      textPaint.render(
+        canvas,
+        score.toString(),
+        Vector2(size[0] / 2, size[1] / 8),
+        anchor: Anchor.center,
+      );
+    }
   }
 
   @override
