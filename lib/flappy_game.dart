@@ -22,8 +22,6 @@ class FlappyGame extends FlameGame with TapDetector, HasCollisionDetection {
 
   Timer? timer;
 
-  InitScreen initScreen = InitScreen();
-
   bool isPlaying = false;
 
   int? score;
@@ -35,8 +33,12 @@ class FlappyGame extends FlameGame with TapDetector, HasCollisionDetection {
   late SharedPreferences prefs;
   final highScoreStorageKey = 'highScore';
 
+  late double yFloor;
+
   @override
   Future<void> onLoad() async {
+    yFloor = size[1] - (size[0] * 112 / 336); // ratio of floor.png
+
     await FlameAudio.audioCache.loadAll(['hit.wav', 'point.wav', 'wing.wav']);
     prefs = await SharedPreferences.getInstance();
     highScore = prefs.getInt(highScoreStorageKey);
@@ -59,7 +61,7 @@ class FlappyGame extends FlameGame with TapDetector, HasCollisionDetection {
         ParallaxComponent(parallax: parallax, priority: 2);
     add(parallaxComponent);
 
-    add(initScreen);
+    add(InitScreen());
   }
 
   onGameOver() async {
@@ -73,11 +75,11 @@ class FlappyGame extends FlameGame with TapDetector, HasCollisionDetection {
     remove(bird);
     removeAll(pipes);
     pipes.clear();
-    add(initScreen);
+    add(InitScreen());
   }
 
   onRestartGame() {
-    remove(initScreen);
+    removeWhere((c) => c is InitScreen);
     timer = Timer.periodic(const Duration(seconds: 2), (Timer time) {
       final p = Pipes();
       pipes.add(p);
@@ -89,8 +91,16 @@ class FlappyGame extends FlameGame with TapDetector, HasCollisionDetection {
     isPlaying = true;
   }
 
+  bool hasBirdCollidedWithFloor() {
+    return isPlaying == true && (bird.y + bird.height) >= yFloor;
+  }
+
   @override
   void update(double dt) {
+    if (hasBirdCollidedWithFloor()) {
+      onGameOver();
+      return;
+    }
     removeAll(pipes.where((element) => element.hasDisappeared == true));
     pipes.removeWhere((element) => element.hasDisappeared == true);
 
