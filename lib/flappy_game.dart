@@ -3,21 +3,19 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
+import 'package:flame/parallax.dart';
 import 'package:flame_audio/flame_audio.dart';
-import 'package:flame/components.dart' show Anchor;
+import 'package:flame/components.dart' show Anchor, ParallaxComponent;
 
 import 'package:flappy_bird/background.dart';
 import 'package:flappy_bird/bird.dart';
 import 'package:flappy_bird/constants.dart';
-import 'package:flappy_bird/floor.dart';
 import 'package:flappy_bird/init_screen.dart';
 import 'package:flappy_bird/pipes.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class FlappyGame extends FlameGame with TapDetector, HasCollisionDetection {
-  List<Floor> floorComponents = [];
-
   final List<Pipes> pipes = [];
 
   Bird bird = Bird();
@@ -46,7 +44,20 @@ class FlappyGame extends FlameGame with TapDetector, HasCollisionDetection {
     add(ScreenHitbox());
     add(Background());
 
-    _loadFloorComponents();
+    final floorLayer = await loadParallaxLayer(
+      ParallaxImageData('floor.png'),
+      fill: LayerFill.width,
+      alignment: Alignment.bottomLeft,
+    );
+
+    final parallax = Parallax(
+      [floorLayer],
+      baseVelocity: Vector2(speed, 0),
+    );
+
+    final parallaxComponent =
+        ParallaxComponent(parallax: parallax, priority: 2);
+    add(parallaxComponent);
 
     add(initScreen);
   }
@@ -78,30 +89,8 @@ class FlappyGame extends FlameGame with TapDetector, HasCollisionDetection {
     isPlaying = true;
   }
 
-  void _loadFloorComponents() {
-    floorComponents = [
-      Floor(initialLeftPosition: 0),
-      Floor(initialLeftPosition: size[0]),
-    ];
-    for (var floorComponent in floorComponents) {
-      add(floorComponent);
-    }
-  }
-
-  void _updateFloorComponents() {
-    floorComponents
-        .where((element) => element.hasDisappeared == true)
-        .forEach((element) {
-      remove(element);
-      floorComponents.removeAt(0);
-      floorComponents.add(Floor(initialLeftPosition: size[0] - 5));
-      add(floorComponents.last);
-    });
-  }
-
   @override
   void update(double dt) {
-    _updateFloorComponents();
     removeAll(pipes.where((element) => element.hasDisappeared == true));
     pipes.removeWhere((element) => element.hasDisappeared == true);
 
