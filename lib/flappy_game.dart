@@ -13,6 +13,7 @@ import 'package:flappy_bird/floor.dart';
 import 'package:flappy_bird/init_screen.dart';
 import 'package:flappy_bird/pipes.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FlappyGame extends FlameGame with TapDetector, HasCollisionDetection {
   List<Floor> floorComponents = [];
@@ -33,9 +34,14 @@ class FlappyGame extends FlameGame with TapDetector, HasCollisionDetection {
     style: const TextStyle(fontFamily: 'flappy_bird', fontSize: 45),
   );
 
+  late SharedPreferences prefs;
+  final highScoreStorageKey = 'highScore';
+
   @override
   Future<void> onLoad() async {
     await FlameAudio.audioCache.loadAll(['hit.wav', 'point.wav', 'wing.wav']);
+    prefs = await SharedPreferences.getInstance();
+    highScore = prefs.getInt(highScoreStorageKey);
 
     add(ScreenHitbox());
     add(Background());
@@ -45,10 +51,11 @@ class FlappyGame extends FlameGame with TapDetector, HasCollisionDetection {
     add(initScreen);
   }
 
-  onGameOver() {
+  onGameOver() async {
     isPlaying = false;
     if ((score ?? 0) >= (highScore ?? 0)) {
       highScore = score;
+      await prefs.setInt(highScoreStorageKey, highScore!);
     }
     FlameAudio.play('hit.wav');
     timer?.cancel();
@@ -123,13 +130,17 @@ class FlappyGame extends FlameGame with TapDetector, HasCollisionDetection {
         Vector2(size[0] / 2, size[1] / 8),
         anchor: Anchor.center,
       );
-    } else if (score != null) {
+      return;
+    }
+    if (score != null) {
       textPaint.render(
         canvas,
         "Score: ${score.toString()}",
         Vector2(size[0] / 2, size[1] / 8),
         anchor: Anchor.center,
       );
+    }
+    if (highScore != null) {
       TextPaint(
         style: const TextStyle(fontFamily: 'flappy_bird', fontSize: 30),
       ).render(

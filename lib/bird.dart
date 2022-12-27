@@ -54,7 +54,7 @@ class Bird extends SpriteAnimationComponent
   @override
   void onCollision(
       Set<Vector2> intersectionPoints, PositionComponent other) async {
-    gameRef.onGameOver();
+    await gameRef.onGameOver();
     super.onCollision(intersectionPoints, other);
   }
 }
