@@ -20,6 +20,7 @@ class Pipes extends Component with HasGameRef<FlappyGame> {
   late final SpriteComponent bottomPipeBody;
   late final SpriteComponent bottomPipeHead;
   bool canUpdateScore = true;
+  bool fullyInitialized = false;
 
   @override
   Future<void>? onLoad() async {
@@ -49,7 +50,8 @@ class Pipes extends Component with HasGameRef<FlappyGame> {
     add(bottomPipeHead);
     add(bottomPipeBody);
 
-    return super.onLoad();
+    super.onLoad();
+    fullyInitialized = true;
   }
 
   Future<SpriteComponent> _getPipeBody() async {

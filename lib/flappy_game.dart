@@ -27,7 +27,8 @@ class FlappyGame extends FlameGame with TapDetector, HasCollisionDetection {
 
   bool isPlaying = false;
 
-  int score = 0;
+  int? score;
+  int? highScore;
   TextPaint textPaint = TextPaint(
     style: const TextStyle(fontFamily: 'flappy_bird', fontSize: 45),
   );
@@ -46,6 +47,9 @@ class FlappyGame extends FlameGame with TapDetector, HasCollisionDetection {
 
   onGameOver() {
     isPlaying = false;
+    if ((score ?? 0) >= (highScore ?? 0)) {
+      highScore = score;
+    }
     FlameAudio.play('hit.wav');
     timer?.cancel();
     remove(bird);
@@ -94,11 +98,13 @@ class FlappyGame extends FlameGame with TapDetector, HasCollisionDetection {
     removeAll(pipes.where((element) => element.hasDisappeared == true));
     pipes.removeWhere((element) => element.hasDisappeared == true);
 
-    pipes.where((element) => element.canUpdateScore).forEach((element) {
+    pipes
+        .where((element) => element.canUpdateScore && element.fullyInitialized)
+        .forEach((element) {
       if ((element.topPipeBody.x + element.topPipeBody.width / 2) <=
           (widthBird + distanceFromLeftBird)) {
         FlameAudio.play('point.wav');
-        score++;
+        score = (score ?? 0) + 1;
         element.canUpdateScore = false;
       }
     });
@@ -115,6 +121,21 @@ class FlappyGame extends FlameGame with TapDetector, HasCollisionDetection {
         canvas,
         score.toString(),
         Vector2(size[0] / 2, size[1] / 8),
+        anchor: Anchor.center,
+      );
+    } else if (score != null) {
+      textPaint.render(
+        canvas,
+        "Score: ${score.toString()}",
+        Vector2(size[0] / 2, size[1] / 8),
+        anchor: Anchor.center,
+      );
+      TextPaint(
+        style: const TextStyle(fontFamily: 'flappy_bird', fontSize: 30),
+      ).render(
+        canvas,
+        "High score: ${highScore.toString()}",
+        Vector2(size[0] / 2, size[1] / 8 + 45),
         anchor: Anchor.center,
       );
     }
