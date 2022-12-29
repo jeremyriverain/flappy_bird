@@ -12,6 +12,7 @@ import 'package:flappy_bird/bird.dart';
 import 'package:flappy_bird/constants.dart';
 import 'package:flappy_bird/init_screen.dart';
 import 'package:flappy_bird/pipes.dart';
+import 'package:flappy_bird/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -26,6 +27,8 @@ class FlappyGame extends FlameGame with TapDetector, HasCollisionDetection {
 
   int? _score;
   int? _highScore;
+  int _delayBeforeRestarting = 0;
+
   final TextPaint _textPaint = TextPaint(
     style: const TextStyle(fontFamily: 'flappy_bird', fontSize: 45),
   );
@@ -37,6 +40,7 @@ class FlappyGame extends FlameGame with TapDetector, HasCollisionDetection {
 
   @override
   Future<void> onLoad() async {
+    super.onLoad();
     _yFloor = size[1] - (size[0] * 112 / 336); // ratio of floor.png
 
     await _initCache();
@@ -66,6 +70,12 @@ class FlappyGame extends FlameGame with TapDetector, HasCollisionDetection {
 
   @override
   void update(double dt) {
+    super.update(dt);
+
+    if (_isPlaying == false) {
+      _delayBeforeRestarting--;
+      return;
+    }
     if (_hasBirdCollidedWithFloor()) {
       onGameOver();
       return;
@@ -78,13 +88,12 @@ class FlappyGame extends FlameGame with TapDetector, HasCollisionDetection {
         .forEach((element) {
       if ((element.topPipeBody.x + element.topPipeBody.width / 2) <=
           (widthBird + distanceFromLeftBird)) {
-        FlameAudio.play('point.wav');
+        playSound('point.wav');
+
         _score = (_score ?? 0) + 1;
         element.canUpdateScore = false;
       }
     });
-
-    super.update(dt);
   }
 
   @override
@@ -122,8 +131,12 @@ class FlappyGame extends FlameGame with TapDetector, HasCollisionDetection {
 
   @override
   void onTap() {
+    super.onTap();
     if (_isPlaying == true) {
       _bird.onTap();
+      return;
+    }
+    if (_delayBeforeRestarting > 0) {
       return;
     }
     _onRestartGame();
@@ -131,11 +144,13 @@ class FlappyGame extends FlameGame with TapDetector, HasCollisionDetection {
 
   onGameOver() async {
     _isPlaying = false;
+    _delayBeforeRestarting = 35;
     if ((_score ?? 0) >= (_highScore ?? 0)) {
       _highScore = _score;
       await _prefs.setInt(_highScoreStorageKey, _highScore!);
     }
-    FlameAudio.play('hit.wav');
+    playSound('hit.wav');
+
     _timer?.cancel();
     remove(_bird);
     removeAll(_pipes);
