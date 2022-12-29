@@ -8,8 +8,8 @@ const double gravityBird = 0.25;
 
 class Bird extends SpriteAnimationComponent
     with HasGameRef<FlappyGame>, CollisionCallbacks {
-  double fallingMovement = 0;
-  bool isJumping = false;
+  double _fallingMovement = 0;
+  bool _isJumping = false;
 
   @override
   Future<void>? onLoad() async {
@@ -34,21 +34,21 @@ class Bird extends SpriteAnimationComponent
 
   @override
   void update(double dt) {
-    if (isJumping == true) {
+    if (_isJumping == true) {
       FlameAudio.play('wing.wav');
-      fallingMovement = -6;
-      isJumping = false;
+      _fallingMovement = -6;
+      _isJumping = false;
     } else {
-      fallingMovement += gravityBird;
+      _fallingMovement += gravityBird;
     }
-    y += fallingMovement;
-    angle = fallingMovement * 0.06;
+    y += _fallingMovement;
+    angle = _fallingMovement * 0.06;
 
     super.update(dt);
   }
 
   void onTap() {
-    isJumping = true;
+    _isJumping = true;
   }
 
   @override
