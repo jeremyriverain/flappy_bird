@@ -7,7 +7,6 @@ import 'package:flame/parallax.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flame/components.dart' show Anchor, ParallaxComponent;
 
-import 'package:flappy_bird/background.dart';
 import 'package:flappy_bird/bird.dart';
 import 'package:flappy_bird/constants.dart';
 import 'package:flappy_bird/init_screen.dart';
@@ -38,6 +37,16 @@ class FlappyGame extends FlameGame with TapDetector, HasCollisionDetection {
 
   late double _yFloor;
 
+  late final Parallax _parallaxBackground;
+  late final Parallax _parallaxFloor;
+
+  final double _backgroundFloorVelocityRatio = 5;
+  late final Vector2 _parallaxVelocityWhilePlaying;
+
+  FlappyGame() {
+    _parallaxVelocityWhilePlaying =
+        Vector2(speed / _backgroundFloorVelocityRatio, 0);
+  }
   @override
   Future<void> onLoad() async {
     super.onLoad();
@@ -48,22 +57,32 @@ class FlappyGame extends FlameGame with TapDetector, HasCollisionDetection {
     _highScore = _prefs.getInt(_highScoreStorageKey);
 
     add(ScreenHitbox());
-    add(Background());
+    // add(Background());
+
+    final backgroundLayer = await loadParallaxLayer(
+      ParallaxImageData('background.png'),
+    );
 
     final floorLayer = await loadParallaxLayer(
       ParallaxImageData('floor.png'),
       fill: LayerFill.width,
       alignment: Alignment.bottomLeft,
+      velocityMultiplier: Vector2(_backgroundFloorVelocityRatio, 0),
     );
 
-    final parallax = Parallax(
+    _parallaxBackground = Parallax(
+      [backgroundLayer],
+      baseVelocity: _parallaxVelocityWhilePlaying,
+    );
+
+    _parallaxFloor = Parallax(
       [floorLayer],
-      baseVelocity: Vector2(speed, 0),
+      baseVelocity: _parallaxVelocityWhilePlaying,
     );
 
-    final parallaxComponent =
-        ParallaxComponent(parallax: parallax, priority: 2);
-    add(parallaxComponent);
+    add(ParallaxComponent(parallax: _parallaxBackground));
+
+    add(ParallaxComponent(parallax: _parallaxFloor, priority: 2));
 
     add(InitScreen());
   }
@@ -73,9 +92,15 @@ class FlappyGame extends FlameGame with TapDetector, HasCollisionDetection {
     super.update(dt);
 
     if (_isPlaying == false) {
+      final parallaxVelocity = Vector2(0, 0);
+      _parallaxFloor.baseVelocity = parallaxVelocity;
+      _parallaxBackground.baseVelocity = parallaxVelocity;
       _delayBeforeRestarting--;
       return;
     }
+
+    _parallaxFloor.baseVelocity = _parallaxVelocityWhilePlaying;
+    _parallaxBackground.baseVelocity = _parallaxVelocityWhilePlaying;
     if (_hasBirdCollidedWithFloor()) {
       onGameOver();
       return;
